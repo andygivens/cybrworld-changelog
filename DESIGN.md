@@ -1,5 +1,18 @@
 # CYBRWorld ChangeLog – Design Document
 
+---
+
+## Collaboration & Workflow
+
+As a Principle Engineer, I prioritize maintainable, well-tested code and thoughtful architecture. I will collaborate with the product designer to clarify product requirements, ask follow-up questions, and ensure a shared understanding before mapping out technical solutions. Our workflow:
+1. Product designer provides broad instructions or feature ideas.
+2. I ask clarifying questions to fully understand the customer need, edge cases, and desired experience.
+3. Once clear, I map out the architecture—including high-level UML diagrams and sequence diagrams for data/event flow.
+4. Product designer reviews and approves the plan.
+5. I begin development, following best practices (TDD, code quality, documentation).
+
+---
+
 ## Overview
 CYBRWorld ChangeLog is a web application for communicating updates and changes to the CYBRWorld demo environment. It features an infinite scroll of updates, expandable details, role-based access for users and administrators, and secure media storage using S3-compatible cloud services.
 
