@@ -16,7 +16,6 @@ services:
       - DB_USER=changelog
       - DB_PASSWORD=changelog
       - S3_ENDPOINT=http://minio:9256
-      - S3_ENDPOINT=http://minio:9256
       - S3_ACCESS_KEY=minioadmin
       - S3_SECRET_KEY=minioadmin
       - S3_BUCKET=changelog-media
@@ -38,7 +37,6 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data
     ports:
-      - "9256:9000"
       - "9256:9000"
     volumes:
       - minio-data:/data
