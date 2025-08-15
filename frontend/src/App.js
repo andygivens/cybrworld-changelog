@@ -3,6 +3,8 @@ import { FaMoon, FaSun } from 'react-icons/fa';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import UpdateFeed from './components/UpdateFeed';
 import AdminPage from './AdminPage';
+import Reports from './pages/Reports';
+import NavBar from './components/NavBar';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -14,27 +16,17 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <header className="main-header">
-          <div className="logo-title">
-            {/* Logo placeholder, replace with CyberArk SVG if available */}
-            <div className="logo" style={{ width: 32, height: 32, background: '#0077C8', borderRadius: '50%', display: 'inline-block', marginRight: 12 }}></div>
-            <h1>CYBRWorld ChangeLog</h1>
-          </div>
-          <div className="header-actions">
-            <a href="/admin" className="admin-link">Admin Login</a>
-            <button
-              className="theme-toggle"
-              onClick={() => setDarkMode(dm => !dm)}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-            </button>
-          </div>
-        </header>
-        <Routes>
-          <Route path="/" element={<UpdateFeed />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Routes>
+  <NavBar darkMode={darkMode} setDarkMode={setDarkMode} />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem', marginBottom: '1.5rem', gap: '1rem' }}>
+          <h1 style={{ textAlign: 'center', color: '#0077C8', fontWeight: 700, fontSize: '2rem', letterSpacing: '0.02em', margin: 0 }}>CYBRWorld ChangeLog</h1>
+        </div>
+        <div style={{ padding: '0 0 2rem 0' }}>
+          <Routes>
+            <Route path="/" element={<UpdateFeed />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/reports" element={<Reports />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

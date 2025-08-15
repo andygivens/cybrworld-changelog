@@ -33,6 +33,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', tags: [], links: '', media: null });
+  const [imagePreview, setImagePreview] = useState(null);
   const [tagInput, setTagInput] = useState('');
   const [allTags, setAllTags] = useState([]);
   const [tagSuggestions, setTagSuggestions] = useState([]);
@@ -77,8 +78,20 @@ function AdminDashboard() {
       } else {
         setTagSuggestions([]);
       }
+    } else if (name === 'media') {
+      const file = files && files[0];
+      setForm(f => ({ ...f, media: file }));
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setImagePreview(null);
+      }
     } else {
-      setForm(f => ({ ...f, [name]: files ? files[0] : value }));
+      setForm(f => ({ ...f, [name]: value }));
     }
   };
 
@@ -144,12 +157,13 @@ function AdminDashboard() {
         await axios.post('/updates', updateData);
         setSuccess('Update created successfully');
       }
-      setForm({ title: '', description: '', tags: [], links: '', media: null });
-      setTagInput('');
-      setTagSuggestions([]);
-      setEditId(null);
-      setShowModal(false);
-      fetchUpdates();
+  setForm({ title: '', description: '', tags: [], links: '', media: null });
+  setImagePreview(null);
+  setTagInput('');
+  setTagSuggestions([]);
+  setEditId(null);
+  setShowModal(false);
+  fetchUpdates();
     } catch (err) {
       setError('Failed to save update');
     }
@@ -164,6 +178,7 @@ function AdminDashboard() {
       links: Array.isArray(update.links) ? update.links.join(', ') : (update.links ? update.links : ''),
       media: null
     });
+    setImagePreview(null);
     setTagInput('');
     setTagSuggestions([]);
     setShowModal(true);
@@ -365,7 +380,12 @@ function AdminDashboard() {
                 </div>
               </div>
               <input name="links" placeholder="Links (comma separated)" value={form.links} onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
-              <input name="media" type="file" accept="image/*" onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
+                <input name="media" type="file" accept="image/*" onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
+                {imagePreview && (
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <img src={imagePreview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e3e8ee' }} />
+                  </div>
+                )}
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="submit" style={{ background: '#0077C8', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600 }}>
                   {editId ? 'Save Changes' : 'Create Update'}
