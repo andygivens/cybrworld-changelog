@@ -1,18 +1,9 @@
 
+
+
 import React, { useState, useEffect, useRef } from 'react';
-// Pastel color palette
-const pastelColors = [
-  '#FFD6E0', // pink
-  '#D6F5FF', // blue
-  '#FFF5D6', // yellow
-  '#D6FFD6', // green
-  '#F5D6FF', // purple
-  '#FFEFD6', // orange
-  '#D6FFF5', // teal
-  '#F5FFD6', // lime
-  '#FFD6F5', // magenta
-  '#D6D6FF', // lavender
-];
+import axios from 'axios';
+import { FaPlus, FaTrash, FaPen } from 'react-icons/fa';
 
 // Assign a color to a tag value (consistent for each tag)
 function getTagColor(tag) {
@@ -21,11 +12,21 @@ function getTagColor(tag) {
   for (let i = 0; i < tag.length; i++) {
     hash = tag.charCodeAt(i) + ((hash << 5) - hash);
   }
+  const pastelColors = [
+    '#FFD6E0', // pink
+    '#D6F5FF', // blue
+    '#FFF5D6', // yellow
+    '#D6FFD6', // green
+    '#F5D6FF', // purple
+    '#FFEFD6', // orange
+    '#D6FFF5', // teal
+    '#F5FFD6', // lime
+    '#FFD6F5', // magenta
+    '#D6D6FF', // lavender
+  ];
   const idx = Math.abs(hash) % pastelColors.length;
   return pastelColors[idx];
 }
-import axios from 'axios';
-import { FaPlus, FaTrash, FaPen } from 'react-icons/fa';
 
 function AdminDashboard() {
   const [updates, setUpdates] = useState([]);
@@ -39,6 +40,7 @@ function AdminDashboard() {
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [validationWarning, setValidationWarning] = useState(null);
 
   useEffect(() => {
     fetchUpdates();
@@ -113,6 +115,11 @@ function AdminDashboard() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setValidationWarning(null);
+    if (!form.title || !form.description) {
+      setValidationWarning('Title and Description are required.');
+      return;
+    }
     try {
       let mediaUrls = [];
       if (form.media) {
@@ -124,7 +131,7 @@ function AdminDashboard() {
       const updateData = {
         title: form.title,
         description: form.description,
-        tags: form.tags.split(',').map(t => t.trim()),
+        tags: form.tags, // Already an array
         links: form.links.split(',').map(l => l.trim()),
         media: mediaUrls.map(url => ({ url, type: 'image' })),
         date: new Date().toISOString(),
@@ -137,9 +144,9 @@ function AdminDashboard() {
         await axios.post('/updates', updateData);
         setSuccess('Update created successfully');
       }
-  setForm({ title: '', description: '', tags: [], links: '', media: null });
-  setTagInput('');
-  setTagSuggestions([]);
+      setForm({ title: '', description: '', tags: [], links: '', media: null });
+      setTagInput('');
+      setTagSuggestions([]);
       setEditId(null);
       setShowModal(false);
       fetchUpdates();
@@ -147,7 +154,6 @@ function AdminDashboard() {
       setError('Failed to save update');
     }
   };
-
 
   const handleEdit = update => {
     setEditId(update.id);
@@ -163,8 +169,6 @@ function AdminDashboard() {
     setShowModal(true);
   };
 
-  // Only one handleReturnToUser function should exist
-
   const handleDelete = async id => {
     setError(null);
     setSuccess(null);
@@ -177,12 +181,13 @@ function AdminDashboard() {
     }
   };
 
-  // Add handler for returning to user interface
   const handleReturnToUser = () => {
     window.location.href = '/';
   };
+
   return (
     <div>
+      {validationWarning && <div style={{ color: '#d32f2f', marginBottom: '0.2rem', fontWeight: 500, padding: '2px 6px' }}>{validationWarning}</div>}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
         <button
@@ -222,9 +227,9 @@ function AdminDashboard() {
           <FaPlus />
         </button>
       </div>
-  {error && <div style={{ color: 'red' }}>{error}</div>}
-  {success && <div style={{ color: 'green' }}>{success}</div>}
-  {loading ? <div>Loading updates...</div> : (
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {success && <div style={{ color: 'green' }}>{success}</div>}
+      {loading ? <div>Loading updates...</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.08)' }}>
           <thead>
             <tr style={{ background: '#f5f7fa' }}>
@@ -245,7 +250,17 @@ function AdminDashboard() {
                 <td style={{ padding: '8px', fontWeight: 500 }}>{update.title}</td>
                 <td style={{ padding: '8px' }}>{update.description}</td>
                 <td style={{ padding: '8px', color: '#888' }}>{new Date(update.date).toLocaleDateString()}</td>
-                <td style={{ padding: '8px' }}>{update.tags && update.tags.join(', ')}</td>
+                <td style={{ padding: '8px' }}>
+                  {Array.isArray(update.tags) && update.tags.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {update.tags.map(tag => (
+                        <span key={tag} style={{ background: getTagColor(tag), color: '#333', borderRadius: '12px', padding: '2px 8px', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </td>
                 <td style={{ padding: '8px' }}>{update.links && update.links.map((link, i) => (
                   <a key={i} href={link} target="_blank" rel="noopener noreferrer" style={{ marginRight: '0.5rem' }}>{link}</a>
                 ))}</td>
@@ -321,31 +336,33 @@ function AdminDashboard() {
               <input name="title" placeholder="Title" value={form.title} onChange={handleChange} required style={{ marginBottom: '0.75rem', fontSize: '1rem' }} />
               <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required style={{ marginBottom: '0.75rem', fontSize: '1rem' }} />
               <div style={{ marginBottom: '0.75rem', position: 'relative' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '6px' }}>
-                  {form.tags.map((tag, idx) => (
-                    <span key={tag} style={{ background: getTagColor(tag), color: '#333', borderRadius: '16px', padding: '4px 12px', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {tag}
-                      <button type="button" style={{ background: 'none', border: 'none', color: '#d32f2f', fontSize: '1rem', cursor: 'pointer', padding: 0 }} onClick={() => handleTagRemove(idx)} aria-label={`Remove tag ${tag}`}>&times;</button>
-                    </span>
-                  ))}
-                  <input
-                    ref={tagInputRef}
-                    name="tags"
-                    placeholder="Add tag..."
-                    value={tagInput}
-                    onChange={handleChange}
-                    onKeyDown={handleTagKeyDown}
-                    style={{ border: 'none', outline: 'none', minWidth: '80px', fontSize: '0.95rem', background: 'transparent' }}
-                    autoComplete="off"
-                  />
-                </div>
-                {tagSuggestions.length > 0 && (
-                  <div style={{ background: '#fff', border: '1px solid #e3e8ee', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.08)', position: 'absolute', zIndex: 1002, marginTop: '2px', padding: '4px 0', minWidth: '120px' }}>
-                    {tagSuggestions.map(tag => (
-                      <div key={tag} style={{ padding: '4px 12px', cursor: 'pointer', color: '#0077C8' }} onMouseDown={() => handleTagSuggestionClick(tag)}>{tag}</div>
+                <div style={{ background: '#f5f7fa', border: '1px solid #e3e8ee', borderRadius: '8px', padding: '10px', marginBottom: '0', minHeight: '44px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '6px' }}>
+                    {form.tags.map((tag, idx) => (
+                      <span key={tag} style={{ background: getTagColor(tag), color: '#333', borderRadius: '12px', padding: '0px 8px', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        {tag}
+                        <button type="button" style={{ background: 'none', border: 'none', color: '#d32f2f', fontSize: '1rem', cursor: 'pointer', padding: 0 }} onClick={() => handleTagRemove(idx)} aria-label={`Remove tag ${tag}`}>&times;</button>
+                      </span>
                     ))}
+                    <input
+                      ref={tagInputRef}
+                      name="tags"
+                      placeholder="Add tag..."
+                      value={tagInput}
+                      onChange={handleChange}
+                      onKeyDown={handleTagKeyDown}
+                      style={{ border: 'none', outline: 'none', minWidth: '80px', fontSize: '0.95rem', background: 'transparent' }}
+                      autoComplete="off"
+                    />
                   </div>
-                )}
+                  {tagSuggestions.length > 0 && (
+                    <div style={{ background: '#fff', border: '1px solid #e3e8ee', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.08)', position: 'absolute', zIndex: 1002, marginTop: '2px', padding: '4px 0', minWidth: '120px' }}>
+                      {tagSuggestions.map(tag => (
+                        <div key={tag} style={{ padding: '4px 12px', cursor: 'pointer', color: '#0077C8' }} onMouseDown={() => handleTagSuggestionClick(tag)}>{tag}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <input name="links" placeholder="Links (comma separated)" value={form.links} onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
               <input name="media" type="file" accept="image/*" onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
