@@ -1,10 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { sequelize } = require('./db');
+
+const { sequelize, Update, Media } = require('./models');
+
+// Set up associations
+Update.hasMany(Media, { foreignKey: 'updateId' });
+Media.belongsTo(Update, { foreignKey: 'updateId' });
+
 const updateRoutes = require('./routes/updateRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const tagsRoutes = require('./routes/tags');
 
 const morgan = require('morgan');
 
@@ -18,6 +25,7 @@ app.use('/updates', updateRoutes);
 app.use('/media', mediaRoutes);
 app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/tags', tagsRoutes);
 
 const PORT = process.env.PORT || 4000;
 

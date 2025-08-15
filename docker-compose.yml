@@ -7,6 +7,10 @@ services:
     volumes:
       - /srv/cybrworld-changelog/frontend/src:/app/src
       - /srv/cybrworld-changelog/frontend/public:/app/public
+    environment:
+      - DANGEROUSLY_DISABLE_HOST_CHECK=true
+      - PUBLIC_URL=http://docker3.home.agivens.io:9056
+      - WDS_SOCKET_PORT=9056
     depends_on:
       - backend
   backend:
@@ -26,6 +30,8 @@ services:
     depends_on:
       - db
       - minio
+    volumes:
+      - /srv/cybrworld-changelog/backend/src:/app/src
   db:
     image: postgres:14
     environment:

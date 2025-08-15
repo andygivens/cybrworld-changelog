@@ -1,12 +1,11 @@
-const { sequelize } = require('../db');
-const Update = require('../models/update')(sequelize);
-const Media = require('../models/media')(sequelize);
+const { Update, Media } = require('../models');
 
 exports.listUpdates = async (req, res) => {
   try {
     const updates = await Update.findAll({ include: [Media] });
     res.json(updates);
   } catch (err) {
+    console.error('Error in listUpdates:', err);
     res.status(500).json({ error: 'Failed to fetch updates' });
   }
 };

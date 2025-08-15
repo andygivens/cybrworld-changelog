@@ -3,22 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.0",
     "axios": "^1.6.7",
     "eslint": "^8.57.0",
-    "svgo": "^2.8.0",
-    "@babel/plugin-transform-private-property-in-object": "^7.24.0"
-    ,"react-router-dom": "^6.23.1"
-    ,"react-icons": "^4.12.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "^5.0.1",
+    "svgo": "^2.8.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  }
-  ,
+  },
   "proxy": "http://backend:4000"
 }
