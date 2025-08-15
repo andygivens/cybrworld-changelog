@@ -1,14 +1,15 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaMoon, FaSun } from 'react-icons/fa';
+import { FaSun } from 'react-icons/fa';
+import { ReactComponent as LobsterIcon } from '../assets/lobster.svg';
 
 const navItems = [
   { label: 'Updates', path: '/' },
-  { label: 'Admin', path: '/admin' },
+  { label: 'Author', path: '/author' },
   { label: 'Reports', path: '/reports' },
 ];
 
-function NavBar({ darkMode, setDarkMode }) {
+function NavBar({ lobsterMode, setLobsterMode }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -46,11 +47,11 @@ function NavBar({ darkMode, setDarkMode }) {
       ))}
       <button
         className="theme-toggle"
-        onClick={() => setDarkMode(dm => !dm)}
-        aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: darkMode ? '#FFD6E0' : '#fff', fontSize: '1.5rem', marginLeft: 'auto' }}
+        onClick={() => setLobsterMode(lm => !lm)}
+        aria-label={lobsterMode ? 'Switch to light mode' : 'Switch to Lobster Mode'}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', color: lobsterMode ? '#FFD6E0' : '#fff', fontSize: '1.5rem', marginLeft: 'auto', display: 'flex', alignItems: 'center' }}
       >
-        {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
+  <LobsterIcon style={{ width: 24, height: 24, color: lobsterMode ? '#413b3b' : '#FFFFFF' }} />
       </button>
     </nav>
   );

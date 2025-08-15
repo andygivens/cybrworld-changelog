@@ -23,6 +23,7 @@ function getTagColor(tag) {
   return pastelColors[idx];
 }
 import axios from 'axios';
+import updatePlaceholder from '../assets/update-placeholder.svg';
 import { FaChevronDown } from 'react-icons/fa';
 
 function UpdateFeed() {
@@ -53,7 +54,7 @@ function UpdateFeed() {
             {update.media && update.media.length > 0 && update.media[0].url ? (
               <img src={update.media[0].url} alt="Update" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <span style={{ color: '#bbb', fontSize: '2rem' }}>🖼️</span>
+              <img src={updatePlaceholder} alt="Update Placeholder" style={{ width: '60px', height: '60px', opacity: 0.8 }} />
             )}
           </div>
           {/* Card content on the right */}

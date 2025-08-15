@@ -1,3 +1,4 @@
+
 # CYBRWorld ChangeLog Backend
 
 ## Setup
@@ -21,12 +22,22 @@
 - `S3_ACCESS_KEY` (e.g., minioadmin)
 - `S3_SECRET_KEY` (e.g., minioadmin)
 - `S3_BUCKET` (e.g., changelog-media)
+- `AUTHOR_PASSWORD` (required for author login)
+
+## API Endpoints
+
+- `/author/login` (POST): Author login. Expects `{ password }` in body. Returns `{ success: true }` if password matches `AUTHOR_PASSWORD`.
+- `/updates` (CRUD): Manage updates.
+- `/media` (CRUD): Manage media files.
+- `/users` (CRUD): Manage users.
+- `/tags` (GET): Get all tags.
 
 ## Testing
-Run tests with:
+Run backend tests with:
 ```bash
 npm test
 ```
+Currently only `updateController` is covered. Add more tests for controllers and routes as needed.
 
 ## Docker
 Build and run the backend container:
@@ -34,3 +45,8 @@ Build and run the backend container:
 docker build -t cybrworld-changelog-backend .
 docker run -p 4000:4000 cybrworld-changelog-backend
 ```
+
+## Housekeeping
+- All admin-related files/routes have been renamed to author terminology.
+- Unused files and obsolete routes have been removed.
+- Add comments and expand unit tests for better maintainability.

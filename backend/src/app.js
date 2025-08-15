@@ -10,7 +10,7 @@ Media.belongsTo(Update, { foreignKey: 'updateId' });
 const updateRoutes = require('./routes/updateRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const authorRoutes = require('./routes/authorRoutes');
 const tagsRoutes = require('./routes/tags');
 
 const morgan = require('morgan');
@@ -24,7 +24,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use('/updates', updateRoutes);
 app.use('/media', mediaRoutes);
 app.use('/users', userRoutes);
-app.use('/admin', adminRoutes);
+app.use('/author', authorRoutes);
 app.use('/tags', tagsRoutes);
 
 const PORT = process.env.PORT || 4000;

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-// POST /admin/login
+// POST /author/login
 router.post('/login', (req, res) => {
   const { password } = req.body;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    return res.status(500).json({ error: 'Admin password not configured.' });
+  const authorPassword = process.env.AUTHOR_PASSWORD;
+  if (!authorPassword) {
+    return res.status(500).json({ error: 'Author password not configured.' });
   }
-  if (password === adminPassword) {
+  if (password === authorPassword) {
     // For MVP, just return success (no JWT/session)
     return res.json({ success: true });
   }

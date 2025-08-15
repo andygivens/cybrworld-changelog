@@ -1,6 +1,17 @@
+
+body.lobster {
+  background-color: #1c1b1b;
+  background-image: url('./assets/lobster.svg');
+  background-repeat: repeat;
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+
 .main-header h1 {
   color: #fff;
 }
+
 /* Modern UI header styles */
 .main-header {
   position: sticky;
