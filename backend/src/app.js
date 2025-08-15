@@ -4,13 +4,20 @@ const { sequelize } = require('./db');
 const updateRoutes = require('./routes/updateRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+const morgan = require('morgan');
 
 const app = express();
 app.use(bodyParser.json());
 
+// Log each request to stdout
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+
 app.use('/updates', updateRoutes);
 app.use('/media', mediaRoutes);
 app.use('/users', userRoutes);
+app.use('/admin', adminRoutes);
 
 const PORT = process.env.PORT || 4000;
 

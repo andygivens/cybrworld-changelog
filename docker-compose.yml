@@ -3,7 +3,10 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "9056:80"
+      - "9056:3000"
+    volumes:
+      - /srv/cybrworld-changelog/frontend/src:/app/src
+      - /srv/cybrworld-changelog/frontend/public:/app/public
     depends_on:
       - backend
   backend:
@@ -19,6 +22,7 @@ services:
       - S3_ACCESS_KEY=minioadmin
       - S3_SECRET_KEY=minioadmin
       - S3_BUCKET=changelog-media
+      - ADMIN_PASSWORD=changeme123
     depends_on:
       - db
       - minio

@@ -1,8 +1,95 @@
+.main-header h1 {
+  color: #fff;
+}
+/* Modern UI header styles */
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #0033A0;
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,51,160,0.08);
+}
+.logo-title {
+  display: flex;
+  align-items: center;
+}
+.logo {
+  width: 32px;
+  height: 32px;
+  background: #0077C8;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.admin-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  background: #0077C8;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+.admin-link:hover {
+  background: #0057b8;
+}
+.theme-toggle {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+.theme-toggle:hover {
+  background: #0077C8;
+}
+.dark .main-header {
+  background: #232b3e;
+  color: #e3e8ee;
+}
+.dark .logo {
+  background: #0057b8;
+}
+.dark .admin-link {
+  background: #0057b8;
+  color: #fff;
+}
+.dark .theme-toggle {
+  color: #e3e8ee;
+}
+@media (max-width: 600px) {
+  .App {
+    padding: 0.5rem;
+  }
+  .main-header {
+    padding: 0.5rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .logo-title h1 {
+    font-size: 1.2rem;
+  }
+}
 body {
   margin: 0;
-  font-family: 'Inter', 'Arial', sans-serif;
+  font-family: 'Inter', 'Roboto', 'Open Sans', 'Arial', sans-serif;
   background: #f5f7fa;
   color: #222;
+  transition: background 0.3s, color 0.3s;
 }
 
 .App {
@@ -12,5 +99,96 @@ body {
 }
 
 h1 {
-  color: #0057b8; /* CyberArk blue */
+  color: #0033A0; /* CyberArk blue */
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.update-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,51,160,0.10);
+  margin-bottom: 2rem;
+  padding: 2rem;
+  border: none;
+  transition: box-shadow 0.3s, background 0.3s, color 0.3s;
+  position: relative;
+}
+.update-card:hover {
+  box-shadow: 0 8px 32px rgba(0,51,160,0.18);
+  background: #f0f4fa;
+}
+
+button {
+  background: #0077C8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0.25rem;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #0033A0;
+}
+
+input, textarea {
+  font-family: inherit;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+header {
+  background: #0033A0;
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  background: #0077C8;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+header a:hover {
+  background: #0057b8;
+}
+
+/* Dark mode styles */
+body.dark {
+  background: #181f2a;
+  color: #e3e8ee;
+}
+.dark .App {
+  background: #181f2a;
+}
+.dark .update-card {
+  background: #232b3e;
+  color: #e3e8ee;
+  border: 1px solid #2c3654;
+}
+.dark button {
+  background: #0057b8;
+  color: #fff;
+}
+.dark header {
+  background: #232b3e;
+  color: #e3e8ee;
+}
+.dark header a {
+  background: #0057b8;
+  color: #fff;
 }
