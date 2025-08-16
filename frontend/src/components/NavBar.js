@@ -1,58 +1,93 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaSun } from 'react-icons/fa';
+import { FaSun, FaMoon, FaPalette } from 'react-icons/fa';
 import { ReactComponent as LobsterIcon } from '../assets/lobster.svg';
+import { useTheme } from '../contexts/ThemeContext';
 
 const navItems = [
   { label: 'Updates', path: '/' },
   { label: 'Author', path: '/author' },
   { label: 'Reports', path: '/reports' },
+  { label: 'Admin', path: '/admin' },
 ];
 
 function NavBar({ lobsterMode, setLobsterMode }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, setTheme, toggleLobsterMode } = useTheme();
+
+  const isMinimalDark = theme === 'minimal-dark';
 
   return (
-    <nav style={{
+    <nav className={isMinimalDark ? 'navbar' : ''} style={{
       display: 'flex',
       alignItems: 'center',
-      background: '#0077C8',
-      padding: '0.5rem 2rem',
-      boxShadow: '0 2px 8px rgba(0,51,160,0.08)',
+      background: isMinimalDark ? 'rgba(52, 73, 94, 0.95)' : '#0077C8',
+      backdropFilter: isMinimalDark ? 'blur(10px)' : 'none',
+      border: isMinimalDark ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+      borderRadius: isMinimalDark ? '12px' : '0',
+      padding: isMinimalDark ? '0.8rem 1.5rem' : '0.1rem 1.2rem',
       position: 'sticky',
       top: 0,
       zIndex: 100,
+      boxShadow: isMinimalDark ? '0 4px 20px rgba(0, 0, 0, 0.3)' : 'none',
+      marginBottom: isMinimalDark ? '2rem' : '0'
     }}>
       {navItems.map(item => (
         <button
           key={item.path}
           onClick={() => navigate(item.path)}
+          className={isMinimalDark ? `nav-button ${location.pathname === item.path ? 'active' : ''}` : ''}
           style={{
-            background: location.pathname === item.path ? '#fff' : 'transparent',
-            color: location.pathname === item.path ? '#0077C8' : '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '0.5rem 1.2rem',
-            marginRight: '1rem',
-            fontWeight: 600,
-            fontSize: '1rem',
+            background: isMinimalDark ? 
+              (location.pathname === item.path ? '#3498db' : 'transparent') :
+              (location.pathname === item.path ? '#fff' : 'transparent'),
+            color: isMinimalDark ?
+              (location.pathname === item.path ? '#fff' : '#bdc3c7') :
+              (location.pathname === item.path ? '#0077C8' : '#fff'),
+            border: isMinimalDark ? 
+              `1px solid ${location.pathname === item.path ? '#3498db' : 'transparent'}` :
+              'none',
+            borderRadius: isMinimalDark ? '8px' : '3px',
+            padding: isMinimalDark ? '0.6rem 1.2rem' : '0.25rem 0.7rem',
+            marginRight: '0.5rem',
+            fontWeight: isMinimalDark ? 500 : 500,
+            fontSize: isMinimalDark ? '0.95rem' : '0.92rem',
             cursor: 'pointer',
-            boxShadow: location.pathname === item.path ? '0 2px 8px rgba(0,51,160,0.08)' : 'none',
-            transition: 'background 0.2s, color 0.2s',
+            boxShadow: 'none',
+            transition: 'all 0.3s ease',
           }}
         >
           {item.label}
         </button>
       ))}
-      <button
-        className="theme-toggle"
-        onClick={() => setLobsterMode(lm => !lm)}
-        aria-label={lobsterMode ? 'Switch to light mode' : 'Switch to Lobster Mode'}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: lobsterMode ? '#FFD6E0' : '#fff', fontSize: '1.5rem', marginLeft: 'auto', display: 'flex', alignItems: 'center' }}
-      >
-  <LobsterIcon style={{ width: 24, height: 24, color: lobsterMode ? '#413b3b' : '#FFFFFF' }} />
-      </button>
+      
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Lobster Mode Toggle */}
+        <button
+          onClick={toggleLobsterMode}
+          aria-label="Toggle Lobster Mode"
+          style={{
+            background: 'none',
+            border: isMinimalDark ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+            borderRadius: isMinimalDark ? '8px' : '50%',
+            cursor: 'pointer',
+            color: isMinimalDark ? '#bdc3c7' : '#fff',
+            fontSize: '1.2rem',
+            padding: isMinimalDark ? '0.5rem' : '0.3rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          <LobsterIcon style={{ 
+            width: 20, 
+            height: 20, 
+            color: isMinimalDark ? '#bdc3c7' : '#fff'
+          }} />
+        </button>
+      </div>
     </nav>
   );
 }

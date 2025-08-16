@@ -6,9 +6,9 @@ exports.getCurrentUser = async (req, res) => {
   // In production, extract user from SSO/JWT
   const mockUser = {
     id: '00000000-0000-0000-0000-000000000001',
-    name: 'Demo Admin',
-    email: 'admin@cybrworld.com',
-    role: 'admin',
+    name: 'Demo Author',
+    email: 'author@cybrworld.com',
+    role: 'author',
     ssoId: 'mock-sso-id',
   };
   res.json(mockUser);

@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FaPlus, FaTrash, FaPen } from 'react-icons/fa';
+import Alert from '../components/Alert';
+import UpdateModal from '../components/UpdateModal';
+import UpdateRow from '../components/UpdateRow';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Assign a color to a tag value (consistent for each tag)
 function getTagColor(tag) {
@@ -36,14 +40,35 @@ function Author() {
 	const [tagSuggestions, setTagSuggestions] = useState([]);
 	const tagInputRef = useRef(null);
 	const [editId, setEditId] = useState(null);
-	const [error, setError] = useState(null);
-	const [success, setSuccess] = useState(null);
+	const [alert, setAlert] = useState({ message: null, result: 'success' });
 	const [validationWarning, setValidationWarning] = useState(null);
+	const [error, setError] = useState(null);
+	const [manageMode, setManageMode] = useState(false);
+	const [selectedUpdates, setSelectedUpdates] = useState([]);
+	const { theme } = useTheme();
+
+	const isDarkTheme = theme === 'minimal-dark';
 
 	useEffect(() => {
 		fetchUpdates();
 		fetchTags();
 	}, []);
+
+	// Show alert for success messages
+	const showSuccess = (msg) => {
+		setAlert({ message: msg, result: 'success' });
+		setTimeout(() => setAlert({ message: null, result: 'success' }), 6000);
+	};
+
+	const showFail = (msg) => {
+		setAlert({ message: msg, result: 'fail' });
+		setTimeout(() => setAlert({ message: null, result: 'fail' }), 6000);
+	};
+
+	const showWarning = (msg) => {
+		setAlert({ message: msg, result: 'warning' });
+		setTimeout(() => setAlert({ message: null, result: 'warning' }), 6000);
+	};
 
 	const fetchTags = async () => {
 		try {
@@ -59,9 +84,9 @@ function Author() {
 		try {
 			const res = await axios.get('/updates');
 			setUpdates(res.data);
-		} catch (err) {
-			setError('Failed to fetch updates');
-		}
+			} catch (err) {
+				showFail('Failed to fetch updates');
+			}
 		setLoading(false);
 	};
 
@@ -123,13 +148,13 @@ function Author() {
 
 	const handleSubmit = async e => {
 		e.preventDefault();
-		setError(null);
-		setSuccess(null);
-		setValidationWarning(null);
-		if (!form.title || !form.description) {
-			setValidationWarning('Title and Description are required.');
-			return;
-		}
+			setError(null);
+			setValidationWarning(null);
+			if (!form.title || !form.description) {
+				showWarning('Title and Description are required.');
+				setValidationWarning('Title and Description are required.');
+				return;
+			}
 		try {
 			let mediaUrls = [];
 			if (form.media) {
@@ -149,11 +174,11 @@ function Author() {
 			};
 			if (editId) {
 				await axios.put(`/updates/${editId}`, updateData);
-				setSuccess('Update edited successfully');
-			} else {
-				await axios.post('/updates', updateData);
-				setSuccess('Update created successfully');
-			}
+				showSuccess('Update edited successfully');
+					} else {
+						await axios.post('/updates', updateData);
+						showSuccess('Update created successfully');
+					}
 	setForm({ title: '', description: '', tags: [], links: '', media: null });
 	setImagePreview(null);
 	setTagInput('');
@@ -161,9 +186,9 @@ function Author() {
 	setEditId(null);
 	setShowModal(false);
 	fetchUpdates();
-		} catch (err) {
-			setError('Failed to save update');
-		}
+			} catch (err) {
+				showFail('Failed to save update');
+			}
 	};
 
 	const handleEdit = update => {
@@ -182,211 +207,186 @@ function Author() {
 	};
 
 	const handleDelete = async id => {
-		setError(null);
-		setSuccess(null);
-		try {
-			await axios.delete(`/updates/${id}`);
-			setSuccess('Update deleted');
-			fetchUpdates();
-		} catch (err) {
-			setError('Failed to delete update');
+			setError(null);
+			try {
+				await axios.delete(`/updates/${id}`);
+				showSuccess('Update deleted');
+				fetchUpdates();
+			} catch (err) {
+				showFail('Failed to delete update');
+			}
+	};
+
+	const handleSelectUpdate = (id) => {
+		setSelectedUpdates(selected =>
+			selected.includes(id)
+				? selected.filter(sid => sid !== id)
+				: [...selected, id]
+		);
+	};
+
+	const handleSelectAll = () => {
+		if (selectedUpdates.length === updates.length) {
+			setSelectedUpdates([]);
+		} else {
+			setSelectedUpdates(updates.map(u => u.id));
 		}
 	};
 
+	const handleBulkDelete = () => {
+		// Implement bulk delete logic here
+	};
+
+	const handleBulkHide = () => {
+		// Implement bulk hide logic here
+	};
+
 	return (
-		<div>
+		<div style={{ 
+			background: isDarkTheme ? 'var(--bg-primary)' : 'transparent',
+			minHeight: '100vh',
+			color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+		}}>
+			<Alert message={alert.message} result={alert.result} />
 			{validationWarning && <div style={{ color: '#d32f2f', marginBottom: '0.2rem', fontWeight: 500, padding: '2px 6px' }}>{validationWarning}</div>}
-			<div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
-				<h2 style={{ margin: 0 }}>Author</h2>
-			</div>
-			<div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+			<div style={{ height: '2.5rem' }} />
+			<div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.3rem', gap: '0.5rem', position: 'relative', justifyContent: 'flex-start' }}>
 				<button
-					style={{ background: 'none', color: '#0077C8', border: 'none', fontSize: '1.5rem', cursor: 'pointer', marginRight: '1rem', padding: 0, position: 'relative' }}
+					style={{ 
+						background: 'none', 
+						color: isDarkTheme ? 'var(--accent-color)' : '#0077C8', 
+						border: 'none', 
+						fontSize: '0.93rem', 
+						fontWeight: 500, 
+						cursor: 'pointer', 
+						marginRight: '0.3rem', 
+						padding: '2px 7px', 
+						position: 'relative' 
+					}}
 					onClick={() => { setEditId(null); setForm({ title: '', description: '', tags: [], links: '', media: null }); setTagInput(''); setTagSuggestions([]); setShowModal(true); }}
 					aria-label="Create New Update"
-					onMouseEnter={e => {
-						const tooltip = document.createElement('div');
-						tooltip.textContent = 'New entry';
-						tooltip.style.position = 'absolute';
-						tooltip.style.top = '120%';
-						tooltip.style.left = '50%';
-						tooltip.style.transform = 'translateX(-50%)';
-						tooltip.style.background = '#333';
-						tooltip.style.color = '#fff';
-						tooltip.style.padding = '2px 8px';
-						tooltip.style.borderRadius = '4px';
-						tooltip.style.fontSize = '0.85rem';
-						tooltip.style.whiteSpace = 'nowrap';
-						tooltip.style.zIndex = '1001';
-						tooltip.className = 'plus-tooltip';
-						e.currentTarget.appendChild(tooltip);
-					}}
-					onMouseLeave={e => {
-						const tooltip = e.currentTarget.querySelector('.plus-tooltip');
-						if (tooltip) e.currentTarget.removeChild(tooltip);
-					}}
 				>
-					<FaPlus />
+					New Entry
 				</button>
+				<span style={{ color: isDarkTheme ? 'var(--accent-color)' : '#0077C8', fontWeight: 500, margin: '0 0.4rem' }}>|</span>
+				<button
+					style={{ 
+						background: 'none', 
+						color: isDarkTheme ? 'var(--accent-color)' : '#0077C8', 
+						border: 'none', 
+						fontSize: '0.93rem', 
+						fontWeight: 500, 
+						cursor: 'pointer', 
+						padding: '2px 7px', 
+						position: 'relative' 
+					}}
+					onClick={() => setManageMode(m => !m)}
+					aria-label="Manage Entries"
+				>
+					Manage
+				</button>
+				{manageMode && updates.length > 0 && (
+					<>
+						<span style={{ color: '#d32f2f', fontWeight: 600, margin: '0 0.4rem' }}>|</span>
+						<button onClick={handleBulkDelete} style={{ background: 'none', color: '#d32f2f', border: 'none', fontWeight: 500, fontSize: '0.93rem', cursor: 'pointer', padding: '2px 7px', position: 'relative' }}>Delete</button>
+						<span style={{ color: '#d32f2f', fontWeight: 600, margin: '0 0.4rem' }}>|</span>
+						<button onClick={handleBulkHide} style={{ background: 'none', color: '#d32f2f', border: 'none', fontWeight: 500, fontSize: '0.93rem', cursor: 'pointer', padding: '2px 7px', position: 'relative' }}>Hide</button>
+					</>
+				)}
 			</div>
 			{error && <div style={{ color: 'red' }}>{error}</div>}
-			{success && <div style={{ color: 'green' }}>{success}</div>}
 			{loading ? <div>Loading updates...</div> : (
-				<table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.08)' }}>
-					<thead>
-						<tr style={{ background: '#f5f7fa' }}>
-							<th style={{ padding: '8px', textAlign: 'left' }}>Title</th>
-							<th style={{ padding: '8px', textAlign: 'left' }}>Description</th>
-							<th style={{ padding: '8px', textAlign: 'left' }}>Date</th>
-							<th style={{ padding: '8px', textAlign: 'left' }}>Tags</th>
-							<th style={{ padding: '8px', textAlign: 'left' }}>Links</th>
-							<th style={{ padding: '8px', textAlign: 'center' }}>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{updates.length === 0 && (
-							<tr><td colSpan={6} style={{ textAlign: 'center', padding: '1rem' }}>No updates found.</td></tr>
-						)}
-						{updates.map(update => (
-							<tr key={update.id} style={{ borderBottom: '1px solid #e3e8ee' }}>
-								<td style={{ padding: '8px', fontWeight: 500 }}>{update.title}</td>
-								<td style={{ padding: '8px' }}>{update.description && update.description.length > 120 ? update.description.slice(0, 120) + '…' : update.description}</td>
-								<td style={{ padding: '8px', color: '#888' }}>{new Date(update.date).toLocaleDateString()}</td>
-								<td style={{ padding: '8px' }}>
-									{Array.isArray(update.tags) && update.tags.length > 0 ? (
-										<div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-											{update.tags.map(tag => (
-												<span key={tag} style={{ background: getTagColor(tag), color: '#333', borderRadius: '12px', padding: '2px 8px', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-													{tag}
-												</span>
-											))}
-										</div>
-									) : null}
-								</td>
-								<td style={{ padding: '8px' }}>{update.links && update.links.map((link, i) => (
-									<a key={i} href={link} target="_blank" rel="noopener noreferrer" style={{ marginRight: '0.5rem' }}>{link}</a>
-								))}</td>
-								<td style={{ padding: '8px', textAlign: 'center' }}>
-									<button
-										style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '0.5rem', color: '#0077C8', fontSize: '1.1rem', position: 'relative' }}
-										onClick={() => handleEdit(update)}
-										aria-label="Edit Update"
-										onMouseEnter={e => {
-											const tooltip = document.createElement('div');
-											tooltip.textContent = 'Edit';
-											tooltip.style.position = 'absolute';
-											tooltip.style.top = '120%';
-											tooltip.style.left = '50%';
-											tooltip.style.transform = 'translateX(-50%)';
-											tooltip.style.background = '#333';
-											tooltip.style.color = '#fff';
-											tooltip.style.padding = '2px 8px';
-											tooltip.style.borderRadius = '4px';
-											tooltip.style.fontSize = '0.85rem';
-											tooltip.style.whiteSpace = 'nowrap';
-											tooltip.style.zIndex = '1001';
-											tooltip.className = 'icon-tooltip';
-											e.currentTarget.appendChild(tooltip);
-										}}
-										onMouseLeave={e => {
-											const tooltip = e.currentTarget.querySelector('.icon-tooltip');
-											if (tooltip) e.currentTarget.removeChild(tooltip);
-										}}
-									>
-										<FaPen />
-									</button>
-									<button
-										style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d32f2f', fontSize: '1.1rem', position: 'relative' }}
-										onClick={() => handleDelete(update.id)}
-										aria-label="Delete Update"
-										onMouseEnter={e => {
-											const tooltip = document.createElement('div');
-											tooltip.textContent = 'Delete';
-											tooltip.style.position = 'absolute';
-											tooltip.style.top = '120%';
-											tooltip.style.left = '50%';
-											tooltip.style.transform = 'translateX(-50%)';
-											tooltip.style.background = '#333';
-											tooltip.style.color = '#fff';
-											tooltip.style.padding = '2px 8px';
-											tooltip.style.borderRadius = '4px';
-											tooltip.style.fontSize = '0.85rem';
-											tooltip.style.whiteSpace = 'nowrap';
-											tooltip.style.zIndex = '1001';
-											tooltip.className = 'icon-tooltip';
-											e.currentTarget.appendChild(tooltip);
-										}}
-										onMouseLeave={e => {
-											const tooltip = e.currentTarget.querySelector('.icon-tooltip');
-											if (tooltip) e.currentTarget.removeChild(tooltip);
-										}}
-									>
-										<FaTrash />
-									</button>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			)}
-			{/* Modal for create/edit update */}
-			{showModal && (
-				<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-					<div style={{ background: '#fff', padding: '2rem', borderRadius: '8px', minWidth: '320px', boxShadow: '0 4px 16px rgba(0,51,160,0.10)' }}>
-						<h3 style={{ marginTop: 0 }}>{editId ? 'Edit Update' : 'Create Update'}</h3>
-						<form onSubmit={handleSubmit}>
-							<input name="title" placeholder="Title" value={form.title} onChange={handleChange} required style={{ marginBottom: '0.75rem', fontSize: '1rem' }} />
-							<textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required style={{ marginBottom: '0.75rem', fontSize: '1rem' }} />
-							<div style={{ marginBottom: '0.75rem', position: 'relative' }}>
-								<div style={{ background: '#f5f7fa', border: '1px solid #e3e8ee', borderRadius: '8px', padding: '10px', marginBottom: '0', minHeight: '44px' }}>
-									<div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '6px' }}>
-										{form.tags.map((tag, idx) => (
-											<span key={tag} style={{ background: getTagColor(tag), color: '#333', borderRadius: '12px', padding: '0px 8px', fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-												{tag}
-												<button type="button" style={{ background: 'none', border: 'none', color: '#d32f2f', fontSize: '1rem', cursor: 'pointer', padding: 0 }} onClick={() => handleTagRemove(idx)} aria-label={`Remove tag ${tag}`}>&times;</button>
-											</span>
-										))}
-										<input
-											ref={tagInputRef}
-											name="tags"
-											placeholder="Add tag..."
-											value={tagInput}
-											onChange={handleChange}
-											onKeyDown={handleTagKeyDown}
-											style={{ border: 'none', outline: 'none', minWidth: '80px', fontSize: '0.95rem', background: 'transparent' }}
-											autoComplete="off"
-										/>
-									</div>
-									{tagSuggestions.length > 0 && (
-										<div style={{ background: '#fff', border: '1px solid #e3e8ee', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,51,160,0.08)', position: 'absolute', zIndex: 1002, marginTop: '2px', padding: '4px 0', minWidth: '120px' }}>
-											{tagSuggestions.map(tag => (
-												<div key={tag} style={{ padding: '4px 12px', cursor: 'pointer', color: '#0077C8' }} onMouseDown={() => handleTagSuggestionClick(tag)}>{tag}</div>
-											))}
-										</div>
-									)}
-								</div>
-							</div>
-							<input name="links" placeholder="Links (comma separated)" value={form.links} onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
-								<input name="media" type="file" accept="image/*" onChange={handleChange} style={{ marginBottom: '0.75rem' }} />
-								{imagePreview && (
-									<div style={{ marginBottom: '0.75rem' }}>
-										<img src={imagePreview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e3e8ee' }} />
-									</div>
-								)}
-							<div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-								<button type="submit" style={{ background: '#0077C8', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600 }}>
-									{editId ? 'Save Changes' : 'Create Update'}
-								</button>
-								<button type="button" style={{ background: '#e3e8ee', color: '#333', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem' }} onClick={() => { setShowModal(false); setEditId(null); setForm({ title: '', description: '', tags: [], links: '', media: null }); setTagInput(''); setTagSuggestions([]); }}>
-									Cancel
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			)}
-		</div>
-	);
+                <div className="author-table-container">
+                    {/* Bulk actions now in top menu bar */}
+                    <table className="author-table" style={{ 
+						width: '100%', 
+						background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+						borderCollapse: 'collapse', 
+						borderRadius: '10px', 
+						overflow: 'hidden', 
+						boxShadow: 'none',
+						border: isDarkTheme ? '1px solid var(--border-color)' : 'none'
+					}}>
+						<thead>
+                            <tr style={{ 
+								borderBottom: isDarkTheme ? '1px solid var(--border-color)' : '1px solid #e3e8ee', 
+								background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd' 
+							}}>
+                                {manageMode && <th style={{ 
+									textAlign: 'center', 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd',
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}><input type="checkbox" checked={selectedUpdates.length === updates.length} onChange={handleSelectAll} style={{ accentColor: isDarkTheme ? 'var(--accent-color)' : '#0077C8' }} /></th>}
+                                <th style={{ 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Title</th>
+                                <th style={{ 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Description</th>
+                                <th style={{ 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Date</th>
+                                <th style={{ 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Tags</th>
+                                <th style={{ 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Links</th>
+                                <th style={{ 
+									textAlign: 'center', 
+									background: isDarkTheme ? 'var(--bg-secondary)' : '#f8fafd', 
+									fontWeight: 500,
+									color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
+								}}>Actions</th>
+                            </tr>
+                        </thead>
+							<tbody>
+								{updates.map(update => (
+									<UpdateRow
+										key={update.id}
+										update={update}
+										manageMode={manageMode}
+										selected={selectedUpdates.includes(update.id)}
+										onSelect={() => handleSelectUpdate(update.id)}
+										onEdit={() => handleEdit(update)}
+										onDelete={() => handleDelete(update.id)}
+									/>
+								))}
+							</tbody>
+						</table>
+                </div>
+            )}
+            <UpdateModal
+                show={showModal}
+                editId={editId}
+                form={form}
+                imagePreview={imagePreview}
+                tagInput={tagInput}
+                tagSuggestions={tagSuggestions}
+                tagInputRef={tagInputRef}
+                handleChange={handleChange}
+                handleTagKeyDown={handleTagKeyDown}
+                handleTagSuggestionClick={handleTagSuggestionClick}
+                handleTagRemove={handleTagRemove}
+                handleSubmit={handleSubmit}
+                setShowModal={setShowModal}
+                setEditId={setEditId}
+                setForm={setForm}
+                setTagInput={setTagInput}
+                setTagSuggestions={setTagSuggestions}
+            />
+        </div>    
+    );
 }
 
 export default Author;

@@ -26,7 +26,7 @@ services:
       - S3_ACCESS_KEY=minioadmin
       - S3_SECRET_KEY=minioadmin
       - S3_BUCKET=changelog-media
-      - ADMIN_PASSWORD=changeme123
+      - AUTHOR_PASSWORD=changeme123
     depends_on:
       - db
       - minio

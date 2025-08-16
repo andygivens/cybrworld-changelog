@@ -1,0 +1,75 @@
+import React, { useState } from 'react';
+import { FaKey, FaUsers, FaLock } from 'react-icons/fa';
+import SSOConfig from '../components/SSOConfig';
+import UserManagement from '../components/UserManagement';
+import AuthorToken from '../components/AuthorToken';
+import Alert from '../components/Alert';
+import { useTheme } from '../contexts/ThemeContext';
+
+const menuItems = [
+  { key: 'sso', label: 'SSO Config', icon: <FaKey /> },
+  { key: 'users', label: 'User Management', icon: <FaUsers /> },
+  { key: 'token', label: 'Author Token', icon: <FaLock /> },
+];
+
+function Admin() {
+  const [active, setActive] = useState('sso');
+  const [alert, setAlert] = useState({ message: null, result: null });
+  const { theme } = useTheme();
+
+  const isDarkTheme = theme === 'minimal-dark';
+
+  return (
+    <div style={{ 
+      display: 'flex', 
+      minHeight: '100vh', 
+      background: isDarkTheme ? 'var(--bg-primary)' : '#f8fafd' 
+    }}>
+      {/* Sidebar */}
+      <nav style={{ 
+        width: 220, 
+        background: isDarkTheme ? 'var(--bg-secondary)' : '#fff', 
+        borderRight: isDarkTheme ? '1px solid var(--border-color)' : '1px solid #e3e8ee', 
+        padding: '2rem 0', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '0.5rem' 
+      }}>
+        {menuItems.map(item => (
+          <button
+            key={item.key}
+            onClick={() => setActive(item.key)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.7rem',
+              background: active === item.key ? (isDarkTheme ? 'var(--bg-tertiary)' : '#f8fafd') : 'none',
+              border: 'none', 
+              color: isDarkTheme ? 'var(--text-primary)' : '#333', 
+              fontWeight: 500, fontSize: '1rem',
+              padding: '0.7rem 1.5rem', cursor: 'pointer', borderRadius: '0 20px 20px 0',
+              boxShadow: active === item.key ? (isDarkTheme ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,51,160,0.04)') : 'none',
+              transition: 'all 0.2s ease'
+            }}
+            aria-label={item.label}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </nav>
+      {/* Main Content */}
+      <main style={{ 
+        flex: 1, 
+        padding: '2.5rem', 
+        maxWidth: 900,
+        background: isDarkTheme ? 'var(--bg-primary)' : 'transparent'
+      }}>
+        <Alert message={alert.message} result={alert.result} />
+        {active === 'sso' && <SSOConfig setAlert={setAlert} />}
+        {active === 'users' && <UserManagement setAlert={setAlert} />}
+        {active === 'token' && <AuthorToken setAlert={setAlert} />}
+      </main>
+    </div>
+  );
+}
+
+export default Admin;

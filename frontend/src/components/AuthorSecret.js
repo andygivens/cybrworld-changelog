@@ -14,8 +14,11 @@ function AuthorSecret({ onLogin }) {
     setError(null);
     try {
       const res = await axios.post('/author/login', { password });
-      if (res.data.success) {
-        onLogin();
+      if (res.data.success && res.data.token) {
+        // Store token in localStorage for 15 minutes
+        localStorage.setItem('authorToken', res.data.token);
+        localStorage.setItem('authorTokenExpiry', Date.now() + 15 * 60 * 1000);
+        onLogin(res.data.token);
       } else {
         setError('Login failed.');
       }
