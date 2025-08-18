@@ -4,12 +4,14 @@ import SSOConfig from '../components/SSOConfig';
 import UserManagement from '../components/UserManagement';
 import AuthorToken from '../components/AuthorToken';
 import Alert from '../components/Alert';
+import ThemePage from '../components/Theme';
 import { useTheme } from '../contexts/ThemeContext';
 
 const menuItems = [
   { key: 'sso', label: 'SSO Config', icon: <FaKey /> },
   { key: 'users', label: 'User Management', icon: <FaUsers /> },
   { key: 'token', label: 'Author Token', icon: <FaLock /> },
+  { key: 'theme', label: 'Theme Settings', icon: <FaLock /> },
 ];
 
 function Admin() {
@@ -67,6 +69,7 @@ function Admin() {
         {active === 'sso' && <SSOConfig setAlert={setAlert} />}
         {active === 'users' && <UserManagement setAlert={setAlert} />}
         {active === 'token' && <AuthorToken setAlert={setAlert} />}
+        {active === 'theme' && <ThemePage />}
       </main>
     </div>
   );
