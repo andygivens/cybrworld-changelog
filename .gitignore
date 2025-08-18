@@ -3,3 +3,4 @@ notes.md
 
 # Ignore seed script
 seed_updates.sh
+node_modules
