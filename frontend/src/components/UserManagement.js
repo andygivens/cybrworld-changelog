@@ -1,8 +1,11 @@
 import React from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 function UserManagement({ setAlert }) {
+  const { theme } = useTheme();
+  const isDarkTheme = theme === 'minimal-dark';
   return (
-    <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,51,160,0.08)', padding: '2rem', maxWidth: 700 }}>
-      <h2 style={{ marginBottom: '1.2rem' }}>User Management</h2>
+    <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,51,160,0.08)', padding: '2rem', maxWidth: 700, color: isDarkTheme ? '#222' : 'inherit' }}>
+      <h2 style={{ marginBottom: '1.2rem', color: isDarkTheme ? '#222' : 'inherit' }}>User Management</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1rem' }}>
         <thead>
           <tr style={{ background: '#f8fafd' }}>

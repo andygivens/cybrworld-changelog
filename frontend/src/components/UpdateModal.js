@@ -76,7 +76,7 @@ function UpdateModal({
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '6px' }}>
                 {form.tags.map((tag, idx) => (
                   <span key={tag} style={{ 
-                    background: isDarkTheme ? 'var(--bg-tertiary)' : '#e3e8ee', 
+                    background: isDarkTheme ? 'var(--bg-tertiary)' : '#fff', 
                     color: isDarkTheme ? 'var(--text-primary)' : '#333', 
                     borderRadius: '12px', 
                     padding: '0px 8px', 
@@ -92,18 +92,11 @@ function UpdateModal({
                 <input
                   ref={tagInputRef}
                   name="tags"
-                  placeholder="Add tag..."
+                  placeholder="Tags"
                   value={tagInput}
                   onChange={handleChange}
                   onKeyDown={handleTagKeyDown}
-                  style={{ 
-                    border: 'none', 
-                    outline: 'none', 
-                    minWidth: '80px', 
-                    fontSize: '0.95rem', 
-                    background: 'transparent',
-                    color: isDarkTheme ? 'var(--text-primary)' : 'inherit'
-                  }}
+                  style={{ border: 'none', outline: 'none', minWidth: '80px', fontSize: '1rem', background: 'transparent', color: isDarkTheme ? 'var(--text-primary)' : 'inherit' }}
                   autoComplete="off"
                 />
               </div>
@@ -130,16 +123,42 @@ function UpdateModal({
               )}
             </div>
           </div>
-          <input name="links" placeholder="Links (comma separated)" value={form.links} onChange={handleChange} style={{ 
-            marginBottom: '0.75rem',
-            background: isDarkTheme ? 'var(--bg-primary)' : '#fff',
-            color: isDarkTheme ? 'var(--text-primary)' : 'inherit',
-            border: isDarkTheme ? '1px solid var(--border-color)' : '1px solid #e3e8ee',
-            borderRadius: '4px',
-            padding: '8px 12px',
-            width: '100%',
-            boxSizing: 'border-box'
-          }} />
+          {/* Links Section */}
+          <div style={{ marginBottom: '0.75rem', border: '1px solid #e3e8ee', borderRadius: '8px', padding: '10px', background: 'transparent' }}>
+            <label style={{ fontWeight: 500, marginBottom: '0.5rem', display: 'block', fontSize: '1rem', color: 'rgb(135, 135, 135)', marginLeft: '.5rem' }}>Links</label>
+            {Array.isArray(form.links) && form.links.length > 0 && form.links.map((link, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <input
+                  type="text"
+                  placeholder="URL"
+                  value={link.url}
+                  onChange={e => {
+                    const newLinks = [...form.links];
+                    newLinks[idx].url = e.target.value;
+                    setForm(f => ({ ...f, links: newLinks }));
+                  }}
+                  style={{ flex: 2, padding: '8px', borderRadius: '4px', border: isDarkTheme ? '1px solid var(--border-color)' : '1px solid #e3e8ee', background: isDarkTheme ? 'var(--bg-primary)' : '#fff', color: isDarkTheme ? 'var(--text-primary)' : '#333', fontSize: '1rem' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Vanity Text"
+                  value={link.text}
+                  onChange={e => {
+                    const newLinks = [...form.links];
+                    newLinks[idx].text = e.target.value;
+                    setForm(f => ({ ...f, links: newLinks }));
+                  }}
+                  style={{ flex: 1, padding: '8px', borderRadius: '4px', border: isDarkTheme ? '1px solid var(--border-color)' : '1px solid #e3e8ee', background: isDarkTheme ? 'var(--bg-primary)' : '#fff', color: isDarkTheme ? 'var(--text-primary)' : '#333', fontSize: '1rem' }}
+                />
+                <button type="button" onClick={() => {
+                  setForm(f => ({ ...f, links: f.links.filter((_, i) => i !== idx) }));
+                }} style={{ background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '4px', padding: '0 10px', cursor: 'pointer', fontSize: '0.85rem', height: '32px' }}>Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => {
+              setForm(f => ({ ...f, links: [...(Array.isArray(f.links) ? f.links : []), { url: '', text: '' }] }));
+            }} style={{ background: isDarkTheme ? 'var(--accent-color)' : '#3498db', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 500, cursor: 'pointer', fontSize: '0.85rem', marginTop: '2px', height: '28px' }}>Add Link</button>
+          </div>
           <input name="media" type="file" accept="image/*" onChange={handleChange} style={{ 
             marginBottom: '0.75rem',
             color: isDarkTheme ? 'var(--text-primary)' : 'inherit'

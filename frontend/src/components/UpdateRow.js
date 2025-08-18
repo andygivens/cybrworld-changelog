@@ -30,8 +30,8 @@ function UpdateRow({ update, manageMode, selected, onSelect, onEdit, onDelete, r
         ) : null}
       </td>
       <td>{update.links && update.links.map((link, i) => (
-        <a key={i} href={link} target="_blank" rel="noopener noreferrer" style={{ marginRight: '0.5rem' }}>{link}</a>
-      ))}</td>
+        link.text
+      )).join(', ')}</td>
       <td style={{ textAlign: 'center' }}>
         <button className="icon-btn" style={{ color: '#888' }} onClick={onEdit} aria-label="Edit Update">
           <FaPen />

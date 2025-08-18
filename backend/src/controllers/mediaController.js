@@ -25,8 +25,25 @@ const upload = multer({
 
 exports.uploadMedia = [
   upload.single('file'),
+  (err, req, res, next) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: 'Multer error', details: err.message });
+    }
+    next();
+  },
   async (req, res) => {
     try {
+      console.log('req.file:', req.file);
+      console.log('req.body:', req.body);
+      if (!req.file) {
+        console.error('No file received:', req.body);
+        return res.status(400).json({ error: 'No file received', details: req.body });
+      }
+      if (!req.body.updateId) {
+        console.error('No updateId provided:', req.body);
+        return res.status(400).json({ error: 'No updateId provided', details: req.body });
+      }
       const media = await Media.create({
         url: req.file.location,
         type: req.file.mimetype,
@@ -34,7 +51,8 @@ exports.uploadMedia = [
       });
       res.status(201).json(media);
     } catch (err) {
-      res.status(400).json({ error: 'Failed to upload media' });
+      console.error('Upload error:', err);
+      res.status(400).json({ error: 'Failed to upload media', details: err.message, stack: err.stack });
     }
   },
 ];

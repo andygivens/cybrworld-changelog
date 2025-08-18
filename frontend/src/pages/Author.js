@@ -5,29 +5,7 @@ import Alert from '../components/Alert';
 import UpdateModal from '../components/UpdateModal';
 import UpdateRow from '../components/UpdateRow';
 import { useTheme } from '../contexts/ThemeContext';
-
-// Assign a color to a tag value (consistent for each tag)
-function getTagColor(tag) {
-	// Simple hash function for string
-	let hash = 0;
-	for (let i = 0; i < tag.length; i++) {
-		hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-	}
-	const pastelColors = [
-		'#FFD6E0', // pink
-		'#D6F5FF', // blue
-		'#FFF5D6', // yellow
-		'#D6FFD6', // green
-		'#F5D6FF', // purple
-		'#FFEFD6', // orange
-		'#D6FFF5', // teal
-		'#F5FFD6', // lime
-		'#FFD6F5', // magenta
-		'#D6D6FF', // lavender
-	];
-	const idx = Math.abs(hash) % pastelColors.length;
-	return pastelColors[idx];
-}
+import { getTagColor } from '../utils';
 
 function Author() {
 	const [updates, setUpdates] = useState([]);
@@ -157,38 +135,38 @@ function Author() {
 			}
 		try {
 			let mediaUrls = [];
-			if (form.media) {
+			let updateIdToUse = editId;
+			// If creating a new update, create it first and get its ID
+			if (!updateIdToUse) {
+				const res = await axios.post('/updates', {
+					title: form.title,
+					description: form.description,
+					tags: form.tags,
+					links: form.links.split(',').map(l => l.trim()),
+					date: new Date().toISOString(),
+					authorId: '00000000-0000-0000-0000-000000000001'
+				});
+				updateIdToUse = res.data.id;
+				showSuccess('Update created successfully');
+			}
+			if (form.media && updateIdToUse) {
 				const mediaData = new FormData();
 				mediaData.append('file', form.media);
-				const mediaRes = await axios.post('/media', mediaData, { headers: { 'Content-Type': 'multipart/form-data' } });
+				mediaData.append('updateId', updateIdToUse);
+				const mediaRes = await axios.post('/media', mediaData);
 				mediaUrls = [mediaRes.data.url];
 			}
-			const updateData = {
-				title: form.title,
-				description: form.description,
-				tags: form.tags, // Already an array
-				links: form.links.split(',').map(l => l.trim()),
-				media: mediaUrls.map(url => ({ url, type: 'image' })),
-				date: new Date().toISOString(),
-				authorId: '00000000-0000-0000-0000-000000000001' // Demo author ID
-			};
-			if (editId) {
-				await axios.put(`/updates/${editId}`, updateData);
-				showSuccess('Update edited successfully');
-					} else {
-						await axios.post('/updates', updateData);
-						showSuccess('Update created successfully');
-					}
-	setForm({ title: '', description: '', tags: [], links: '', media: null });
-	setImagePreview(null);
-	setTagInput('');
-	setTagSuggestions([]);
-	setEditId(null);
-	setShowModal(false);
-	fetchUpdates();
-			} catch (err) {
-				showFail('Failed to save update');
-			}
+			// Optionally update the update with media info if needed
+			setForm({ title: '', description: '', tags: [], links: '', media: null });
+			setImagePreview(null);
+			setTagInput('');
+			setTagSuggestions([]);
+			setEditId(null);
+			setShowModal(false);
+			fetchUpdates();
+		} catch (err) {
+			showFail('Failed to save update');
+		}
 	};
 
 	const handleEdit = update => {

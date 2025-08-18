@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 function SSOConfig({ setAlert }) {
+  const { theme } = useTheme();
+  const isDarkTheme = theme === 'minimal-dark';
   const [provider, setProvider] = useState('Google');
   const [fields, setFields] = useState({
     clientId: '',
@@ -41,8 +44,8 @@ function SSOConfig({ setAlert }) {
   };
 
   return (
-    <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,51,160,0.08)', padding: '2rem', maxWidth: 650 }}>
-      <h2 style={{ marginBottom: '1.2rem' }}>SSO Configuration</h2>
+    <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px rgba(0,51,160,0.08)', padding: '2rem', maxWidth: 650, color: isDarkTheme ? '#222' : 'inherit' }}>
+      <h2 style={{ marginBottom: '1.2rem', color: isDarkTheme ? '#222' : 'inherit' }}>SSO Configuration</h2>
       <form onSubmit={e => { e.preventDefault(); setAlert({ message: 'SSO settings saved!', result: 'success' }); }}>
         <div style={{ marginBottom: '1rem' }}>
           <label>Provider</label><br />
