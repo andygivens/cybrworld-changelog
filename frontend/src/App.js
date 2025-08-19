@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+//import components
 import UpdateFeed from './components/UpdateFeed';
-import Admin from './pages/Admin';
-import AuthorPage from './AuthorPage';
-import Reports from './pages/Reports';
 import NavBar from './components/NavBar';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import './styles/minimal-dark.css';
+
+// import pages
+import Admin from './pages/Admin';
+import Reports from './pages/Reports';
 import ThemePage from './pages/Theme';
+import Login from './pages/Login';
+
+//import contexts
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { UserProvider } from './contexts/UserContext';
+
+//import styles
+import './styles/minimal-dark.css';
+
 
 function AppContent() {
   const { theme, toggleLobsterMode } = useTheme();
@@ -39,10 +49,10 @@ function AppContent() {
         <div style={{ padding: '0 0 2rem 0' }}>
           <Routes>
             <Route path="/" element={<UpdateFeed />} />
-            <Route path="/author" element={<AuthorPage />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/theme" element={<ThemePage />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </div>
       </div>
@@ -53,7 +63,9 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
     </ThemeProvider>
   );
 }

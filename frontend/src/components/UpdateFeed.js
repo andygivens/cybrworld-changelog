@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { getTagColor } from '../utils';
 import axios from 'axios';
@@ -16,7 +15,7 @@ function UpdateFeed() {
 
   useEffect(() => {
     // Fetch updates from backend API
-    axios.get('/updates')
+    axios.get('/api/updates')
       .then(res => {
         if (Array.isArray(res.data) && res.data.length > 0) {
           setUpdates(res.data);

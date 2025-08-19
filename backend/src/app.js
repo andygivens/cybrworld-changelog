@@ -15,6 +15,7 @@ const tagsRoutes = require('./routes/tags');
 
 const morgan = require('morgan');
 const AWS = require('aws-sdk');
+const authController = require('./controllers/authController');
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,11 +23,12 @@ app.use(bodyParser.json());
 // Log each request to stdout
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
-app.use('/updates', updateRoutes);
-app.use('/media', mediaRoutes);
-app.use('/users', userRoutes);
-app.use('/author', authorRoutes);
-app.use('/tags', tagsRoutes);
+app.use('/api/updates', updateRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/author', authorRoutes);
+app.use('/api/tags', tagsRoutes);
+app.post('/api/auth/login', authController.login);
 
 const s3 = new AWS.S3({
   endpoint: process.env.S3_ENDPOINT,

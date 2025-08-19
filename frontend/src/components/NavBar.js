@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaSun, FaMoon, FaPalette } from 'react-icons/fa';
 import { ReactComponent as LobsterIcon } from '../assets/lobster.svg';
 import { useTheme } from '../contexts/ThemeContext';
+import { useUser } from '../contexts/UserContext';
 
 const navItems = [
   { label: 'Updates', path: '/' },
@@ -16,6 +17,7 @@ const navItems = [
 ];
 
 function NavBar({ lobsterMode, setLobsterMode }) {
+  const { user, login, logout } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, setTheme, toggleLobsterMode } = useTheme();
@@ -114,8 +116,26 @@ function NavBar({ lobsterMode, setLobsterMode }) {
           onClose={handleMenuClose}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          PaperProps={{
+            style: {
+              minWidth: 264,
+              fontSize: '0.97rem',
+              padding: '0.7rem 1.2rem',
+            }
+          }}
         >
-          <MenuItem onClick={handleLoginClick}>Login</MenuItem>
+          {/* Show user name if logged in */}
+          {user && (
+            <div style={{ fontSize: '0.97rem', fontWeight: 500, marginBottom: 8, color: '#0077C8' }}>
+              {user.name || user.email}
+            </div>
+          )}
+          <MenuItem
+            onClick={user ? logout : handleLoginClick}
+            style={{ fontSize: '0.97rem' }}
+          >
+            {user ? 'Logout' : 'Login'}
+          </MenuItem>
         </Menu>
       </div>
 
